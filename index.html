@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crush - Love Agreement</title>
+  <!-- html2canvas: ရလဒ်ကို PNG ပုံအဖြစ် သိမ်းဆည်းရန် -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Padauk', 'Myanmar Text', sans-serif;
+    }
+    body {
+      background-color: #fce4ec;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 15px;
+    }
+    .card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 360px;
+      padding: 24px;
+      border-radius: 24px;
+      box-shadow: 0 10px 25px rgba(255, 105, 180, 0.15);
+      text-align: center;
+      position: relative;
+    }
+    .step-text {
+      color: #ff80ab;
+      font-size: 13px;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+    .question {
+      font-size: 18px;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 20px;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .img-box {
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 24px;
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff0f3;
+    }
+    .img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      position: relative;
+      min-height: 50px;
+    }
+    button {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 20px;
+      font-size: 15px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: transform 0.2s;
+    }
+    .btn-yes {
+      background-color: #ff4081;
+      color: white;
+      box-shadow: 0 4px 12px rgba(255, 64, 129, 0.35);
+    }
+    .btn-no {
+      background-color: #f1f2f6;
+      color: #7f8c8d;
+      position: relative;
+    }
+    /* Final Agreement Card */
+    .agreement-list {
+      text-align: left;
+      font-size: 13px;
+      line-height: 1.8;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .agreement-item {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed #eee;
+      padding: 6px 0;
+    }
+    .agreement-ans {
+      font-weight: bold;
+      color: #ff4081;
+      margin-left: 8px;
+      white-space: nowrap;
+    }
+    .download-btn {
+      width: 100%;
+      background: #ff4081;
+      color: white;
+      padding: 12px;
+      border-radius: 20px;
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card" id="mainCard">
+  <!-- Step View -->
+  <div id="stepView">
+    <div class="step-text" id="stepIndicator">Step 1 of 5</div>
+    <div class="question" id="questionText">ကိုယ့်ကို crush နေတာကြာပြီမလား ?</div>
+    <div class="img-box">
+      <img id="stepImage" src="image/1.jpg" alt="Crush">
+    </div>
+    <div class="btn-group" id="btnGroup">
+      <button class="btn-yes" id="yesBtn" onclick="nextStep()">ဟုတ်တယ်</button>
+      <button class="btn-no" id="noBtn" onmouseover="dodgeNo()" onclick="dodgeNo()">မဟုတ်ပါဘူး</button>
+    </div>
+  </div>
+
+  <!-- Agreement Result View (Step 5 ပြီးလျှင် ပေါ်မည်) -->
+  <div id="agreementView" style="display: none;">
+    <h3 style="margin-bottom: 15px; color: #ff4081;">💖 Crush Agreement</h3>
+    <div class="agreement-list" id="agreementList">
+      <!-- မေးခွန်းနှင့် အဖြေများ ဤနေရာတွင် အလိုအလျောက် ပေါ်လာမည် -->
+    </div>
+    <button class="download-btn" onclick="downloadPNG()">ဒီစာမျက်နှာကို PNG သိမ်းရန်</button>
+  </div>
+</div>
+
+<script>
+  // Crush အတွက် သီးသန့် မေးခွန်းစာရင်းများ
+  const steps = [
+    {
+      q: "ကိုယ့်ကို crush နေတာကြာပြီမလား ?",
+      yes: "ဟုတ်တယ်",
+      no: "မဟုတ်ပါဘူး",
+      ans: "ဟုတ်တယ်",
+      img: "image/1.jpg"
+    },
+    {
+      q: "တွေ့တိုင်း ရင်ခုန်နေရတာ မောလှပြီမလား",
+      yes: "တကယ်ပဲ",
+      no: "မခုန်ပါဘူး",
+      ans: "တကယ်ပဲ",
+      img: "image/2.jpg"
+    },
+    {
+      q: "ဒါဆို အခုကစပြီး တရားဝင် တွဲကြမယ်နော်",
+      yes: "တွဲမယ်",
+      no: "မတွဲနိုင်ပါဘူး",
+      ans: "တွဲမယ်",
+      img: "image/3.jpg"
+    },
+    {
+      q: "ကိုယ့်တစ်ယောက်တည်းကိုပဲ အမြဲချစ်ပေးမှာလား",
+      yes: "ဒါပေါ့",
+      no: "စဉ်းစားဦးမယ်",
+      ans: "ဒါပေါ့",
+      img: "image/4.jpg"
+    },
+    {
+      q: "ဘယ်တော့မှ လက်မလွှတ်ကြေးနော်",
+      yes: "I said Yes ❤️",
+      no: "Nope",
+      ans: "I said Yes ❤️",
+      img: "image/5.jpg"
+    }
+  ];
+
+  let currentStep = 0;
+
+  // "No" ခလုတ်ကို နှိပ်မရအောင် ပြေးခိုင်းခြင်း
+  function dodgeNo() {
+    const noBtn = document.getElementById('noBtn');
+    const x = Math.random() * 160 - 80;
+    const y = Math.random() * 80 - 40;
+    noBtn.style.transform = `translate(${x}px, ${y}px)`;
+  }
+
+  function nextStep() {
+    currentStep++;
+    if (currentStep < steps.length) {
+      updateUI();
+    } else {
+      showAgreement();
+    }
+  }
+
+  function updateUI() {
+    const data = steps[currentStep];
+    document.getElementById('stepIndicator').innerText = `Step ${currentStep + 1} of 5`;
+    document.getElementById('questionText').innerText = data.q;
+    document.getElementById('yesBtn').innerText = data.yes;
+    document.getElementById('noBtn').innerText = data.no;
+    document.getElementById('stepImage').src = data.img;
+    // reset No button position
+    document.getElementById('noBtn').style.transform = 'translate(0, 0)';
+  }
+
+  function showAgreement() {
+    document.getElementById('stepView').style.display = 'none';
+    const agreementView = document.getElementById('agreementView');
+    agreementView.style.display = 'block';
+
+    const listContainer = document.getElementById('agreementList');
+    listContainer.innerHTML = '';
+
+    steps.forEach((step, index) => {
+      const item = document.createElement('div');
+      item.className = 'agreement-item';
+      item.innerHTML = `
+        <span>${index + 1}. ${step.q}</span>
+        <span class="agreement-ans">${step.ans}</span>
+      `;
+      listContainer.appendChild(item);
+    });
+  }
+
+  // PNG ပုံအဖြစ် Download ရယူခြင်း
+  function downloadPNG() {
+    const card = document.getElementById('mainCard');
+    html2canvas(card).then(canvas => {
+      const link = document.createElement('a');
+      link.download = 'Crush_Agreement.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+  }
+</script>
+
+</body>
+</html>
